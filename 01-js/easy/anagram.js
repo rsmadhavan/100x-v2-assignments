@@ -5,7 +5,10 @@
 */
 
 function isAnagram(str1, str2) {
-
+  return returnSortedString(str1)===returnSortedString(str2);
 }
 
+function returnSortedString(str){
+  return str.toLowerCase().split('').sort().join('');
+}
 module.exports = isAnagram;
