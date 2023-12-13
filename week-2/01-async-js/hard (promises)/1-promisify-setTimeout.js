@@ -3,6 +3,9 @@
 */
 
 function wait(n) {
+  return new Promise((resolve,reason)=>{
+    setTimeout(resolve,n*1000); // resolve, not resolve() -> don't call the function but pass it
+  })  
 }
 
 module.exports = wait;
