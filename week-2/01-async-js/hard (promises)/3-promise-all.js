@@ -5,19 +5,33 @@
  */
 
 function wait1(t) {
-
+  return new Promise((resolve,reject)=>{
+    setTimeout(resolve,t*1000);
+  });
 }
 
 function wait2(t) {
-
+  return new Promise((resolve,reject)=>{
+    setTimeout(resolve,t*1000);
+  });
 }
 
 function wait3(t) {
-
+  return new Promise((resolve,reject)=>{
+    setTimeout(resolve,t*1000);
+  });
 }
 
 function calculateTime(t1, t2, t3) {
-
+  const startTime = performance.now();
+  return Promise.all([wait1(t1),wait2(t2),wait3(t3)])
+    .then(function(){
+      const endTime = performance.now();
+      console.log(endTime-startTime);
+      return endTime-startTime;
+    })
+    .catch((err)=>console.error(err));
 }
-
+//Promise all takes all the callbacks as an array and returns after all the callbacks get executed
+//Callbacks are called in input array and rejected when the first callback's promise gets rejected
 module.exports = calculateTime;
