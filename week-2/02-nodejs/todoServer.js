@@ -46,26 +46,28 @@ const shortid = require("shortid");
 
 const app = express();
 
-const todoArray = [
-  {
-    title: "Todo 1",
-    completed: false,
-    description: "Buy groceries",
-    id: "SKAvtXzrz",
-  },
-  {
-    title: "Todo 2",
-    completed: false,
-    description: "Finish assignments",
-    id: "iZ9RR9Dkt",
-  },
-  {
-    title: "Todo 3",
-    completed: false,
-    description: "Go outside",
-    id: "OH0UoYB65",
-  },
-];
+// const todoArray = [
+//   {
+//     title: "Todo 1",
+//     completed: false,
+//     description: "Buy groceries",
+//     id: "SKAvtXzrz",
+//   },
+//   {
+//     title: "Todo 2",
+//     completed: false,
+//     description: "Finish assignments",
+//     id: "iZ9RR9Dkt",
+//   },
+//   {
+//     title: "Todo 3",
+//     completed: false,
+//     description: "Go outside",
+//     id: "OH0UoYB65",
+//   },
+// ];
+
+const todoArray = []
 
 app.use(bodyParser.json());
 
@@ -76,8 +78,7 @@ app.use(bodyParser.json());
  * @route {200} - return all todo items in JSON format
  */
 app.get("/todos", (req, res) => {
-  res.status(200);
-  res.json(todoArray);
+  res.status(200).json(todoArray);
 });
 
 /** Retrieve a specific todo item by ID
@@ -91,10 +92,9 @@ app.get("/todos/:id", (req, res) => {
   const id = req.params.id;
   const searchItem = todoArray.find((item) => item["id"] == id);
   if (searchItem) {
-    res.json(searchItem);
+    res.status(200).json(searchItem);
   } else {
-    res.status(404);
-    res.send("Not found");
+    res.status(404).send("Not found");
   }
 });
 
@@ -109,8 +109,7 @@ app.post("/todos", (req, res) => {
   const data = req.body;
   data.id = shortid.generate();
   todoArray.push(data);
-  res.status(201);
-  res.json({ message: "POST request received", data: data });
+  res.status(201).json(data);
 });
 
 /** Update an existing todo item by ID
@@ -130,11 +129,9 @@ app.put("/todos/:id", (req, res) => {
         item[key] = data[key];
       }
     }
-    res.status(200);
-    res.json(item);
+    res.status(200).json(item);
   } else {
-    res.status(404);
-    res.send("Not found");
+    res.status(404).send("Not found");
   }
 });
 
@@ -149,18 +146,21 @@ app.delete("/todos/:id", (req, res) => {
   const index = todoArray.findIndex((item) => item["id"] === id);
   if (index !== -1) {
     const deletedTodo = todoArray.splice(index, 1);
-    res.status(200);
-    res.json(deletedTodo);
+    res.status(200).json(deletedTodo);
   } else {
-    res.status(404);
-    res.send("Not found");
+    res.status(404).send("Not found");
   }
 });
 
-app.listen(port, function () {
-  console.clear();
-  console.log(`Server OK! Running on localhost:${port}`);
-});
+app.use((req,res,next)=>{
+  res.status(404).send('Invalid route!')
+})
+
+// commented out for test cases
+// app.listen(port, function () {
+//   console.clear();
+//   console.log(`Server OK! Running on localhost:${port}`);
+// });
 
 module.exports = app;
 
