@@ -39,11 +39,129 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-  const express = require('express');
-  const bodyParser = require('body-parser');
-  
-  const app = express();
-  
-  app.use(bodyParser.json());
-  
-  module.exports = app;
+const express = require("express");
+const bodyParser = require("body-parser");
+const port = 3000;
+const shortid = require("shortid");
+
+const app = express();
+
+const todoArray = [
+  {
+    title: "Todo 1",
+    completed: false,
+    description: "Buy groceries",
+    id: "SKAvtXzrz",
+  },
+  {
+    title: "Todo 2",
+    completed: false,
+    description: "Finish assignments",
+    id: "iZ9RR9Dkt",
+  },
+  {
+    title: "Todo 3",
+    completed: false,
+    description: "Go outside",
+    id: "OH0UoYB65",
+  },
+];
+
+app.use(bodyParser.json());
+
+/** Retrieve all todo items
+ *
+ * @route GET '/todos'
+ * @param none
+ * @route {200} - return all todo items in JSON format
+ */
+app.get("/todos", (req, res) => {
+  res.status(200);
+  res.json(todoArray);
+});
+
+/** Retrieve a specific todo item by ID
+ *
+ * @route GET /todos/:id
+ * @param {object} id.path.required - id of fetched todo
+ * @returns {object} 200 - todo item in JSON format
+ * @returns {object} 404 - not found
+ */
+app.get("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  const searchItem = todoArray.find((item) => item["id"] == id);
+  if (searchItem) {
+    res.json(searchItem);
+  } else {
+    res.status(404);
+    res.send("Not found");
+  }
+});
+
+/** Create a new todo item
+ *
+ * @route POST /todos
+ * @param {object} todo.body.required - object representing the todo item
+ * @return {object} 201 - created todo id
+ */
+app.post("/todos", (req, res) => {
+  console.clear();
+  const data = req.body;
+  data.id = shortid.generate();
+  todoArray.push(data);
+  res.status(201);
+  res.json({ message: "POST request received", data: data });
+});
+
+/** Update an existing todo item by ID
+ *
+ * @route POST /todos/{id}
+ * @param {uuid} id.path.required - Used ID
+ * @returns {} 200 - success message
+ * @returns {} 404 - item not found
+ */
+app.put("/todos/:id", (req, res) => {
+  const data = req.body;
+  const id = req.params.id;
+  const item = todoArray.find((item) => item.id===id); // returns object or undefined
+  if (item) {
+    for (const key in data) {
+      if (data.hasOwnProperty(key) && item.hasOwnProperty(key)) {
+        item[key] = data[key];
+      }
+    }
+    res.status(200);
+    res.json(item);
+  } else {
+    res.status(404);
+    res.send("Not found");
+  }
+});
+
+/** Delete a todo item by ID
+ * @route DELETE /todos/:id
+ * @param {string} todo.id.required
+ * @returns {object} 200 - todo data that was deleted
+ * @returns {object} 404 - not found
+ */
+app.delete("/todos/:id", (req, res) => {
+  const id = req.params.id;
+  const index = todoArray.findIndex((item) => item["id"] === id);
+  if (index !== -1) {
+    const deletedTodo = todoArray.splice(index, 1);
+    res.status(200);
+    res.json(deletedTodo);
+  } else {
+    res.status(404);
+    res.send("Not found");
+  }
+});
+
+app.listen(port, function () {
+  console.clear();
+  console.log(`Server OK! Running on localhost:${port}`);
+});
+
+module.exports = app;
+
+// Validate data before updating - try later
