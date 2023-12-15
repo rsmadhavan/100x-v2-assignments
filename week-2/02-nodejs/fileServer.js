@@ -13,9 +13,53 @@
     Testing the server - run `npm run test-fileServer` command in terminal
  */
 const express = require('express');
+const bodyParser = require('body-parser')
 const fs = require('fs');
+// use require('fs') to promise to promisify the library
 const path = require('path');
+const { error } = require('console');
 const app = express();
 
+app.use(bodyParser.json());
 
+/** Returns a list of files present in './files/' dir
+ * 
+ * @route GET /files
+ * @return {object} 200 - aray of file name in JSON format
+ * 
+ */
+app.get('/files',async(req,res)=>{
+  const filePath = path.join(__dirname,'/files/');
+  fs.readdir(filePath,(err,files)=>{
+    if (err) return res.status(500).json({error:'Internal server error'});
+    return res.json(files);
+  })
+})
+
+
+/** Return content of given file by name
+ * 
+ * @route /file/:filename
+ * @param {string} req.query.filename.required
+ * @return {object} 200 - file content 
+ * @return {string} 404 - Not found
+ * 
+ */   
+app.get('/file/:filename',(req,res)=>{
+  const filePath = path.join(__dirname,'/files/',req.params.filename);
+  fs.readFile(filePath,(err,file)=>{
+    if (err) return res.status(404).send('File not found');
+    return res.send(file);
+  })
+})
+
+/** Return invalid routes */
+
+app.use((req,res,next)=>{
+  res.status(404).send('Route not found');
+});
+
+// app.listen(3000,function(){
+//   console.log('Server started! Running on localhost:3000');
+// })
 module.exports = app;
