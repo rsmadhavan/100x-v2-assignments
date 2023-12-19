@@ -1,0 +1,1 @@
+//tsconfig.json expects atleast 1 typescript file or throws an error
